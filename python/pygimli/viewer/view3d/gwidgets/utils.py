@@ -1,5 +1,6 @@
 import matplotlib as mpl
 import numpy as np
+from shutil import which
 
 from PyQt5.QtCore import Qt, QPointF, QRect, QSize
 from PyQt5.QtGui import (
@@ -106,6 +107,12 @@ class GToolBar(QWidget):
             tooltip="Save displayed mesh as VTK"
         )
 
+        self.btn_paraview = GButton(
+            text="Open in Paraview",
+            tooltip="For more possibilities..."
+        )
+        self._checkForParaview()
+
         # parameter choosing
         lyt_v1 = QVBoxLayout()
         lyt_v1.addWidget(self.cbbx_params)
@@ -195,6 +202,7 @@ class GToolBar(QWidget):
         lyt_h2 = QHBoxLayout()
         lyt_h2.addWidget(self.btn_screenshot)
         lyt_h2.addWidget(self.btn_exportVTK)
+        lyt_h2.addWidget(self.btn_paraview)
         lyt_h2.setContentsMargins(2, 2, 2, 2)
         grp_export = QGroupBox("Export")
         grp_export.setLayout(lyt_h2)
@@ -241,6 +249,22 @@ class GToolBar(QWidget):
             p.end()
 
             yield QIcon(px), cmap
+
+    def _checkForParaview(self):
+        """
+        Disable the button if paraview is not present.
+
+        Note
+        ----
+        shutil's *which* apparently works on MacOS, Linux and Windows.
+        Should be tested nevertheless.
+        """
+        w = which('paraview')
+        if w is None:
+            self.btn_paraview.setEnabled(False)
+            self.btn_paraview.setToolTip(
+                "You need to have Paraview installed to use this Button"
+                )
 
 
 class GButton(QPushButton):

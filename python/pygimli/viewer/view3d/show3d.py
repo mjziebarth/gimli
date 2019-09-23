@@ -6,6 +6,7 @@ BUGS:
 
 import numpy as np
 from shutil import copyfile
+import subprocess
 import signal
 import sys
 
@@ -401,6 +402,17 @@ class Show3D(QMainWindow):
                 self.resetExtrema(label)
         self.updateParameterView()
 
+    def callParaview(self):
+        """
+        Open the current vtk in paraview as subprocess.
+
+        Note
+        ----
+        The check if paraview is present on the system is handled in
+        utils._checkForParaview
+        """
+        subprocess.run(['paraview', self.tmpMesh])
+
     def _enableSlicers(self):
         if self.toolbar.btn_slice_plane.isChecked():
             self.toolbar.slice_x.setEnabled(True)
@@ -423,12 +435,16 @@ class Show3D(QMainWindow):
         self.toolbar.btn_global_limits.clicked.connect(self.setGlobalLimits)
         self.toolbar.btn_screenshot.clicked.connect(self.takeScreenShot)
         self.toolbar.btn_exportVTK.clicked.connect(self.exportMesh)
+        self.toolbar.btn_paraview.clicked.connect(self.callParaview)
+
         self.toolbar.chbx_threshold.clicked.connect(self.updateParameterView)
         self.toolbar.chbx_threshold.clicked.connect(self._checkStatusThreshold)
+
         self.toolbar.btn_apply.clicked.connect(self.updateParameterView)
         self.toolbar.btn_reset.clicked.connect(self.resetExtrema)
         self.toolbar.btn_slice_plane.clicked.connect(self._checkStatusPlaneSlice)
         self.toolbar.btn_slice_volume.clicked.connect(self._checkStatusVolumeSlice)
+
         self.toolbar.slice_x.sliderReleased.connect(self.updateParameterView)
         self.toolbar.slice_y.sliderReleased.connect(self.updateParameterView)
         self.toolbar.slice_z.sliderReleased.connect(self.updateParameterView)
