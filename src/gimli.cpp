@@ -29,7 +29,11 @@
 //#include <omp.h> need -lgomp of -fopenmp
 
 #if OPENBLAS_CBLAS_FOUND
+#if ARCH_LINUX
+	#include <f77blas.h>
+#else
     #include <cblas.h>
+#endif
 #endif
 
 #if USE_BOOST_THREAD
@@ -67,8 +71,13 @@ void setThreadCount(Index nThreads){
     log(Debug, "Set amount of threads to " + str(nThreads));
     //log(Debug, "omp_get_max_threads: " + str(omp_get_max_threads()));
 #if OPENBLAS_CBLAS_FOUND
+#if ARCH_LINUX
+	int nThreads_i = nThreads;
+    openblas_set_num_threads_(&nThreads_i);
+#else
     openblas_set_num_threads(nThreads);
     //omp_set_num_threads
+#endif
 #else
     log(Debug, "can't set openblas thread count. ");    
 #endif

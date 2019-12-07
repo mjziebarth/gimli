@@ -240,6 +240,9 @@ find_package(UMFPACK)
 if (";${BLAS_LIBRARIES};" MATCHES "openblas")
     message(STATUS "openblas is used: ${BLAS_LIBRARIES}")
     
+    FIND_PATH(ArchLinux_OpenBLAS_INCLUDE_DIR 
+        NAMES f77blas.h 
+    )
     FIND_PATH(OpenBLAS_INCLUDE_DIR 
         NAMES cblas.h 
         PATHS /usr/include/openblas
@@ -250,6 +253,11 @@ if (";${BLAS_LIBRARIES};" MATCHES "openblas")
             NAMES cblas.h 
         )
     endif()
+    if (ArchLinux_OpenBLAS_INCLUDE_DIR)
+        FIND_PATH(ArchLinux_OpenBLAS_INCLUDE_DIR 
+            NAMES f77blas.h 
+        )
+    endif()
     message(STATUS "openblas cblas.h: ${OpenBLAS_INCLUDE_DIR}")
   
     if (OpenBLAS_INCLUDE_DIR)
@@ -258,9 +266,17 @@ if (";${BLAS_LIBRARIES};" MATCHES "openblas")
         set(OPENBLAS_CBLAS_FOUND FALSE)
     endif()
 
+    if (ArchLinux_OpenBLAS_INCLUDE_DIR)
+        set(ARCH_LINUX TRUE)
+        message(STATUS "openblas f77blas.h: ${ArchLinux_OpenBLAS_INCLUDE_DIR}")
+    else()
+        set(ARCH_LINUX FALSE)
+    endif()
+    
     set(OPENBLAS_FOUND TRUE)
 else()
     set(OPENBLAS_FOUND FALSE)
+    set(ARCH_LINUX FALSE)
 endif()
 
 if (NOT AVOID_CPPUNIT)
